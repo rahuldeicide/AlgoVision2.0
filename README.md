@@ -1,110 +1,109 @@
-# AlgoVision 2.0 — Unified Analytics Platform
+# AlgoVision 2.0
 
-**DSA Capstone Major Project**
-Integrates core Data Structures & Algorithms into one console-based analytics
-platform spanning logistics, e-commerce, and fintech use cases.
+DSA capstone project for my internship. The idea is to take the core data
+structures and algorithms I've learned and actually put them to use in
+something that looks like a real analytics system instead of solving them
+as isolated leetcode-style problems. I built it around three domains that
+get used a lot in industry talks - logistics, e-commerce, and fintech -
+because most of the operations you need there map pretty cleanly onto
+specific DSA topics.
 
----
+## What it does
 
-## 1. Module-to-DSA Mapping
+There are 5 modules, each living in its own package, and a main `App.java`
+that ties them together so you can run them individually or all at once.
 
-| # | Module | DSA Concepts | Java Package | Real-World Mapping |
-|---|--------|---------------|---------------|----------------------|
-| 1 | Data Ingestion | Queue, Hashing | `com.algovision.ingestion` | Orders arrive continuously; processed FIFO (Queue) while indexed for instant lookup (HashMap) |
-| 2 | Cataloging | Arrays, Linear/Binary Search, Sorting | `com.algovision.catalog` | Product catalog stored contiguously; supports fast bulk sort + search |
-| 3 | Search Engine | BST, Min-Heap | `com.algovision.search` | BST enables price range queries; Heap surfaces most urgent orders instantly |
-| 4 | Optimizer | Greedy, Dynamic Programming (0/1 Knapsack) | `com.algovision.optimizer` | Greedy batches max order count under capacity; DP finds the provably optimal value-for-budget batch |
-| 5 | Visualization | Weighted Graph, Dijkstra, BFS | `com.algovision.visualization` | Models a warehouse-to-city delivery network; computes shortest routes and renders them in the console |
+**1. Data Ingestion** (`ingestion/`) - simulates orders coming in from
+customers. Uses a Queue so orders get processed in the order they arrive
+(FIFO), and a HashMap on the side so I can still pull up any order by ID or
+customer name instantly instead of scanning through everything.
 
-`com.algovision.app.App` is the single entry point that wires all five
-modules together against one shared dataset (Option 6 in the menu runs the
-full pipeline end-to-end).
+**2. Cataloging** (`catalog/`) - basic product catalog backed by a plain
+array. Has linear search, sorting, and binary search on top of it so you
+can compare how much faster binary search is once the array is sorted.
 
----
+**3. Search Engine** (`search/`) - this is where it gets more interesting.
+A BST keyed by price so you can do range queries (e.g. "show me everything
+between ₹3000-10000"), and a min-heap that always tells you the most urgent
+order without having to look through the whole list.
 
-## 2. Time & Space Complexity Summary
+**4. Optimizer** (`optimizer/`) - the part I'm most proud of. There's a
+greedy algorithm that packs as many orders as possible into a delivery
+batch under a budget, and a separate 0/1 knapsack DP solution that finds
+the actual optimal batch for the same budget. Running both on the same
+data side by side really shows why greedy isn't always "good enough" -
+DP picks a different, better combination almost every time.
 
-| Operation | Complexity | Notes |
-|---|---|---|
-| Queue enqueue/dequeue | O(1) | LinkedList-backed `Queue` |
-| HashMap get/put | O(1) average | O(n) worst case (hash collisions) |
-| Array insert (amortized) | O(1) | Doubles capacity when full |
-| Linear search | O(n) | Baseline before BST/hash lookups |
-| `Arrays.sort` | O(n log n) | TimSort for objects |
-| Binary search | O(log n) | Requires pre-sorted array |
-| BST insert/search | O(log n) average, O(n) worst | Unbalanced BST — worst case on skewed insertion order |
-| BST range query | O(k + log n) | k = number of matching results |
-| Heap insert/extract | O(log n) | Java `PriorityQueue` (binary heap) |
-| Top-K from heap | O(k log n) | |
-| Greedy batching | O(n log n) | Sort once, single pass |
-| 0/1 Knapsack (DP) | O(n × W) time, O(n × W) space | Pseudo-polynomial; W = budget |
-| Dijkstra (graph) | O((V + E) log V) | Min-heap based |
-| BFS | O(V + E) | |
+**5. Visualization** (`visualization/`) - models a small delivery network
+(warehouse + a few cities) as a weighted graph, then runs Dijkstra to find
+the shortest route from the warehouse to any city. Also renders the graph
+and the route as plain text in the console since I didn't want to deal
+with a GUI library for this.
 
-**Key tradeoff to highlight in your report/demo:** Greedy is faster and
-simpler but only *near-optimal*; DP is slower but *provably optimal* for the
-knapsack-style budget allocation problem. This is intentionally demonstrated
-side-by-side in Module 4 on the *same* dataset and budget so the difference
-in output is visible directly.
+## Why these specific DS choices
 
-**Known design tradeoff:** The BST is intentionally left unbalanced (no
-AVL/Red-Black self-balancing) to keep the implementation teachable at
-capstone level. This is worth mentioning in your report as a "future
-improvement" — it shows the mentor you understand the limitation, not just
-the happy path.
+- Queue + Hash for ingestion because that's literally how it works in real
+  systems - FIFO processing but O(1) lookup when support/another module
+  needs a specific order.
+- Arrays for the catalog because it's the simplest possible structure and
+  a good baseline before introducing the BST.
+- BST + Heap together because they solve different problems - BST is good
+  when you care about order/range, heap is good when you only ever care
+  about "what's most urgent right now."
+- Greedy vs DP is the classic tradeoff example - greedy is faster (O(n log n))
+  but doesn't guarantee the best outcome, DP is slower (O(n*budget)) but
+  guarantees optimal. I wanted both in the same project so it's obvious why
+  you'd pick one over the other.
+- Graph + Dijkstra because routing/logistics problems are basically always
+  shortest-path problems underneath.
 
----
+## Known limitation
 
-## 3. How to Build & Run
+The BST isn't self-balancing (no AVL/Red-Black logic), so technically it
+can degrade to O(n) in the worst case if products get inserted in already-
+sorted order. Didn't implement balancing since it adds a lot of extra code
+for something that wasn't the main point of this project, but it's a fair
+thing to bring up if asked - I'd add it as a next step if I extended this.
 
-### Option A — IntelliJ IDEA (recommended, since you're using it)
-1. Unzip the project folder anywhere on your machine.
-2. Open IntelliJ → `File` → `Open` → select the **AlgoVision2.0** folder (the
-   one containing `pom.xml`).
-3. IntelliJ will detect it as a Maven project and prompt to load it — click
-   **Load Maven Project** (or it may auto-import).
-4. Wait for indexing to finish (progress bar at bottom-right).
-5. Open `src/main/java/com/algovision/app/App.java`.
-6. Click the green ▶ Run arrow next to `public static void main(...)`.
-7. The console panel at the bottom will show the interactive menu — type a
-   number (1–6) and press Enter to explore each module, or `0` to exit.
+## How to run it
 
-If IntelliJ doesn't auto-detect Maven, right-click `pom.xml` → **Add as Maven
-Project**.
+### IntelliJ
+1. Unzip the folder somewhere.
+2. Open IntelliJ, File > Open, select the AlgoVision2.0 folder (the one
+   with pom.xml in it).
+3. It should auto-detect Maven and ask to import - say yes. If it doesn't
+   pop up, right click pom.xml > Add as Maven Project.
+4. Open `App.java` and hit the green run button next to `main`.
+5. It'll print a menu in the console - type 1 to 6 to try each module, 6
+   runs everything together, 0 exits.
 
-### Option B — Plain javac/java (no Maven, no IDE needed)
-From the project root folder (the one containing `src/`):
-```bash
-mkdir -p out
+### Terminal (if you don't want to use an IDE)
+```
+mkdir out
 javac -d out $(find src -name "*.java")
 java -cp out com.algovision.app.App
 ```
 
-### Option C — Maven CLI
-```bash
+### Maven
+```
 mvn clean package
 java -jar target/AlgoVision2.0.jar
 ```
 
----
+## Complexity reference
 
-## 4. Suggested Demo Flow (for mentor evaluation)
+| Module | Operation | Time | Space |
+|---|---|---|---|
+| Ingestion | enqueue/dequeue | O(1) | O(n) |
+| Ingestion | hashmap lookup | O(1) avg | O(n) |
+| Catalog | linear search | O(n) | O(1) |
+| Catalog | sort | O(n log n) | O(n) |
+| Catalog | binary search | O(log n) | O(1) |
+| Search Engine | BST insert/search | O(log n) avg, O(n) worst | O(n) |
+| Search Engine | heap insert/extract | O(log n) | O(n) |
+| Optimizer | greedy batching | O(n log n) | O(n) |
+| Optimizer | DP knapsack | O(n * budget) | O(n * budget) |
+| Visualization | Dijkstra | O((V+E) log V) | O(V) |
 
-1. Run option **6 (Full Pipeline Demo)** first — shows all 5 modules working
-   on one shared dataset, proving "unified platform" integration.
-2. Then revisit individual modules (1–5) to pause and explain the complexity
-   of each operation as it prints.
-3. For Module 4, explicitly point out that Greedy and DP are run on the
-   **same** order list and **same** budget, and explain why their outputs
-   differ — this is usually the most impressive 30 seconds of the demo.
-4. For Module 5, explain that Dijkstra is exactly what real route-planning
-   engines (delivery apps, maps) use, just at a much larger scale.
-
----
-
-## 5. Possible Extensions (mention in "Reflection" section of your report)
-
-- Replace the unbalanced BST with a self-balancing AVL or Red-Black tree.
-- Persist data via a file or embedded DB instead of in-memory seed data.
-- Swap the console visualization for a JavaFX or web dashboard.
-- Add unit tests (JUnit) per module for the "Code Quality" criterion.
+Put this together for the mentor evaluation round - happy to extend it with
+unit tests or a proper report doc if that's needed for submission too.
