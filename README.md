@@ -65,30 +65,7 @@ sorted order. Didn't implement balancing since it adds a lot of extra code
 for something that wasn't the main point of this project, but it's a fair
 thing to bring up if asked - I'd add it as a next step if I extended this.
 
-## How to run it
 
-### IntelliJ
-1. Unzip the folder somewhere.
-2. Open IntelliJ, File > Open, select the AlgoVision2.0 folder (the one
-   with pom.xml in it).
-3. It should auto-detect Maven and ask to import - say yes. If it doesn't
-   pop up, right click pom.xml > Add as Maven Project.
-4. Open `App.java` and hit the green run button next to `main`.
-5. It'll print a menu in the console - type 1 to 6 to try each module, 6
-   runs everything together, 0 exits.
-
-### Terminal (if you don't want to use an IDE)
-```
-mkdir out
-javac -d out $(find src -name "*.java")
-java -cp out com.algovision.app.App
-```
-
-### Maven
-```
-mvn clean package
-java -jar target/AlgoVision2.0.jar
-```
 
 ## Complexity reference
 
