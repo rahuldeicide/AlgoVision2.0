@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlgoVision 2.0 — DSA Capstone Demo</title>
+<style>
+  :root{
+    --bg:#0F1419;
+    --bg-raised:#171D24;
+    --bg-inset:#0A0E12;
+    --line:#262E37;
+    --line-soft:#1C232B;
+    --text:#E8E6E1;
+    --text-dim:#9CA3AE;
+    --text-faint:#5C6470;
+    --amber:#E8A33D;
+    --amber-dim:#5C4A2A;
+    --teal:#3DBFAD;
+    --teal-dim:#1F4843;
+    --mono:'JetBrains Mono', monospace;
+    --sans:'Inter', sans-serif;
+    --maxw:920px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--amber);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
+  code, .mono{font-family:var(--mono);}
+  ::selection{background:var(--amber-dim);}
+
+  /* ---- Top nav ---- */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(15,20,25,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:var(--maxw);margin:0 auto;padding:14px 24px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .brand{font-family:var(--mono);font-weight:700;font-size:14px;letter-spacing:0.02em;color:var(--text);}
+  .brand span{color:var(--amber);}
+  .navlinks{display:flex;gap:20px;font-family:var(--mono);font-size:12px;color:var(--text-dim);}
+  .navlinks a{color:var(--text-dim);}
+  .navlinks a:hover{color:var(--amber);text-decoration:none;}
+  @media (max-width:640px){ .navlinks{display:none;} }
+
+  /* ---- Hero ---- */
+  .hero{padding:72px 0 56px;border-bottom:1px solid var(--line-soft);}
+  .eyebrow{
+    font-family:var(--mono);font-size:12px;color:var(--teal);
+    text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;
+  }
+  h1{
+    font-size:clamp(32px,5vw,48px);line-height:1.1;margin:0 0 16px;
+    font-weight:700;letter-spacing:-0.01em;
+  }
+  .hero p.lede{font-size:17px;color:var(--text-dim);max-width:620px;margin:0 0 32px;}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:40px;}
+  .pill{
+    font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:4px;
+    border:1px solid var(--line);color:var(--text-dim);
+  }
+
+  /* ---- hero live strip ---- */
+  .live-strip{
+    border:1px solid var(--line);border-radius:8px;background:var(--bg-inset);
+    padding:20px 24px;overflow-x:auto;
+  }
+  .live-strip svg{display:block;min-width:600px;}
+
+  /* ---- module sections ---- */
+  .module{padding:64px 0;border-bottom:1px solid var(--line-soft);}
+  .module:last-of-type{border-bottom:none;}
+  .module-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px;flex-wrap:wrap;}
+  .module-num{font-family:var(--mono);font-size:13px;color:var(--text-faint);}
+  .module h2{font-size:24px;margin:0;font-weight:700;}
+  .module-tags{font-family:var(--mono);font-size:11px;color:var(--teal);margin:0 0 20px;}
+  .module-desc{color:var(--text-dim);font-size:15px;max-width:640px;margin:0 0 28px;}
+
+  .panel{
+    background:var(--bg-raised);border:1px solid var(--line);border-radius:10px;
+    padding:24px;
+  }
+  .panel + .panel{margin-top:16px;}
+  .panel h3{font-size:13px;font-weight:700;margin:0 0 14px;color:var(--text-dim);
+    text-transform:uppercase;letter-spacing:0.04em;}
+
+  button{
+    font-family:var(--mono);font-size:12px;background:transparent;
+    border:1px solid var(--line);color:var(--text);padding:8px 14px;
+    border-radius:6px;cursor:pointer;transition:border-color .15s, color .15s;
+  }
+  button:hover{border-color:var(--amber);color:var(--amber);}
+  button:active{transform:scale(0.98);}
+  button.primary{border-color:var(--amber);color:var(--amber);}
+  button.primary:hover{background:var(--amber-dim);}
+  button.teal{border-color:var(--teal);color:var(--teal);}
+  button.teal:hover{background:var(--teal-dim);}
+  button:disabled{opacity:0.35;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
+
+  input[type=range]{width:100%;accent-color:var(--amber);}
+  input[type=number], input[type=text]{
+    background:var(--bg-inset);border:1px solid var(--line);color:var(--text);
+    font-family:var(--mono);font-size:13px;padding:8px 10px;border-radius:6px;width:100px;
+  }
+  label.field{font-family:var(--mono);font-size:11px;color:var(--text-dim);display:block;margin-bottom:6px;}
+
+  .log{
+    background:var(--bg-inset);border:1px solid var(--line-soft);border-radius:6px;
+    padding:14px 16px;font-family:var(--mono);font-size:12.5px;line-height:1.8;
+    max-height:260px;overflow-y:auto;color:var(--text-dim);
+  }
+  .log .hl{color:var(--amber);}
+  .log .ok{color:var(--teal);}
+  .log .row{white-space:pre;}
+
+  /* ---- queue / array visuals ---- */
+  .cells{display:flex;gap:6px;flex-wrap:wrap;}
+  .cell{
+    min-width:64px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;
+    background:var(--bg-inset);font-family:var(--mono);font-size:11.5px;color:var(--text-dim);
+    text-align:center;transition:border-color .2s, color .2s, transform .2s;
+  }
+  .cell.active{border-color:var(--amber);color:var(--amber);transform:translateY(-3px);}
+  .cell.done{border-color:var(--teal);color:var(--teal);}
+
+  /* ---- complexity badges ---- */
+  .complexity{
+    display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:18px;
+  }
+  .ctag{
+    font-family:var(--mono);font-size:11px;border:1px solid var(--line-soft);
+    color:var(--text-faint);padding:3px 8px;border-radius:4px;
+  }
+
+  table.data{width:100%;border-collapse:collapse;font-size:13px;}
+  table.data th{
+    text-align:left;font-family:var(--mono);font-size:11px;color:var(--text-faint);
+    text-transform:uppercase;letter-spacing:0.03em;padding:6px 10px;border-bottom:1px solid var(--line);
+  }
+  table.data td{padding:7px 10px;border-bottom:1px solid var(--line-soft);color:var(--text-dim);}
+  table.data tr.active td{color:var(--amber);}
+  table.data tr.chosen td{color:var(--teal);}
+
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:680px){ .twocol{grid-template-columns:1fr;} }
+
+  /* footer */
+  footer{padding:48px 0 80px;color:var(--text-faint);font-size:13px;}
+  footer a{color:var(--text-dim);}
+
+  .stat-row{display:flex;gap:24px;flex-wrap:wrap;margin-top:14px;}
+  .stat{font-family:var(--mono);}
+  .stat .v{font-size:20px;color:var(--text);display:block;}
+  .stat .k{font-size:11px;color:var(--text-faint);}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">algo<span>vision</span>2.0</div>
+    <div class="navlinks">
+      <a href="#ingestion">ingestion</a>
+      <a href="#catalog">catalog</a>
+      <a href="#search">search</a>
+      <a href="#optimizer">optimizer</a>
+      <a href="#graph">graph</a>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">DSA capstone &middot; live in-browser demo</p>
+    <h1>AlgoVision 2.0</h1>
+    <p class="lede">
+      Five modules, five core data structures, one shared dataset of orders moving
+      through ingestion, cataloging, search, optimization, and routing. Everything
+      below runs in your browser — no backend, no build step.
+    </p>
+    <div class="hero-meta">
+      <span class="pill">Queue + Hashing</span>
+      <span class="pill">Arrays + Binary Search</span>
+      <span class="pill">BST + Min-Heap</span>
+      <span class="pill">Greedy + 0/1 Knapsack DP</span>
+      <span class="pill">Weighted Graph + Dijkstra</span>
+    </div>
+    <div class="live-strip">
+      <svg id="hero-svg" viewBox="0 0 880 90" width="100%" height="90"></svg>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ================= MODULE 1: INGESTION ================= -->
+  <section class="module" id="ingestion">
+    <div class="module-head">
+      <span class="module-num">01</span>
+      <h2>Data ingestion</h2>
+    </div>
+    <p class="module-tags">Queue · HashMap</p>
+    <p class="module-desc">
+      Orders arrive and get pushed onto a queue, so they're always processed in the
+      order they came in. A hash index sits alongside it, so any order can still be
+      pulled up instantly by ID without scanning the line.
+    </p>
+
+    <div class="panel">
+      <h3>FIFO queue</h3>
+      <div class="btn-row">
+        <button class="primary" onclick="ingestion.processNext()">Process next order</button>
+        <button onclick="ingestion.reset()">Reset queue</button>
+      </div>
+      <div class="cells" id="queue-cells"></div>
+      <div class="stat-row">
+        <div class="stat"><span class="v" id="queue-pending">7</span><span class="k">pending</span></div>
+        <div class="stat"><span class="v" id="queue-processed">0</span><span class="k">processed</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Hash lookup — O(1) average</h3>
+      <div class="btn-row">
+        <label class="field" style="margin:0 8px 0 0; align-self:center;">Order ID</label>
+        <input type="number" id="lookup-id" value="103">
+        <button onclick="ingestion.lookup()">Find order</button>
+      </div>
+      <div class="log" id="lookup-log">// type an order ID (101&ndash;107) and click "find order"</div>
+    </div>
+
+    <div class="complexity">
+      <span class="ctag">enqueue O(1)</span>
+      <span class="ctag">dequeue O(1)</span>
+      <span class="ctag">hash get/put O(1) avg</span>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 2: CATALOG ================= -->
+  <section class="module" id="catalog">
+    <div class="module-head">
+      <span class="module-num">02</span>
+      <h2>Cataloging</h2>
+    </div>
+    <p class="module-tags">Arrays · Linear &amp; binary search · Sort</p>
+    <p class="module-desc">
+      The product catalog lives in a plain array. You can search it the slow way
+      (scan every item) or sort it once and binary-search after that — watch the
+      comparison counter to see the gap.
+    </p>
+
+    <div class="panel">
+      <h3>Catalog array</h3>
+      <div class="cells" id="catalog-cells"></div>
+    </div>
+
+    <div class="twocol">
+      <div class="panel">
+        <h3>Linear search — O(n)</h3>
+        <div class="btn-row">
+          <input type="text" id="linear-target" value="Monitor" style="width:140px;">
+          <button onclick="catalogDemo.linearSearch()">Search</button>
+        </div>
+        <div class="log" id="linear-log">// scans left to right, one by one</div>
+      </div>
+      <div class="panel">
+        <h3>Binary search — O(log n)</h3>
+        <div class="btn-row">
+          <input type="number" id="binary-target" value="9000" style="width:100px;">
+          <button onclick="catalogDemo.binarySearch()">Search (sorted by price)</button>
+        </div>
+        <div class="log" id="binary-log">// catalog gets sorted by price first, then halves the search space each step</div>
+      </div>
+    </div>
+
+    <div class="complexity">
+      <span class="ctag">array insert O(1) amortized</span>
+      <span class="ctag">sort O(n log n)</span>
+      <span class="ctag">linear search O(n)</span>
+      <span class="ctag">binary search O(log n)</span>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 3: SEARCH ENGINE ================= -->
+  <section class="module" id="search">
+    <div class="module-head">
+      <span class="module-num">03</span>
+      <h2>Search engine</h2>
+    </div>
+    <p class="module-tags">Binary search tree · Min-heap</p>
+    <p class="module-desc">
+      Two structures, two jobs. The BST keeps products ordered by price so range
+      queries ("everything between ₹3000 and ₹10000") are fast. The heap doesn't
+      care about order at all — it only ever needs to answer "what's most urgent
+      right now."
+    </p>
+
+    <div class="panel">
+      <h3>BST — price range query</h3>
+      <svg id="bst-svg" viewBox="0 0 640 220" width="100%" height="220"></svg>
+      <div class="btn-row" style="margin-top:14px;">
+        <input type="number" id="range-min" value="3000" style="width:90px;">
+        <span style="align-self:center;color:var(--text-faint);font-family:var(--mono);font-size:12px;">to</span>
+        <input type="number" id="range-max" value="10000" style="width:90px;">
+        <button onclick="bstDemo.rangeQuery()">Run range query</button>
+      </div>
+      <div class="log" id="bst-log">// click "run range query" to highlight matching nodes</div>
+    </div>
+
+    <div class="panel">
+      <h3>Min-heap — most urgent order</h3>
+      <div class="btn-row">
+        <button class="primary" onclick="heapDemo.extractMin()">Extract most urgent</button>
+        <button onclick="heapDemo.reset()">Reset heap</button>
+      </div>
+      <svg id="heap-svg" viewBox="0 0 640 200" width="100%" height="200"></svg>
+    </div>
+
+    <div class="complexity">
+      <span class="ctag">BST insert/search O(log n) avg, O(n) worst</span>
+      <span class="ctag">heap insert/extract O(log n)</span>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 4: OPTIMIZER ================= -->
+  <section class="module" id="optimizer">
+    <div class="module-head">
+      <span class="module-num">04</span>
+      <h2>Optimizer</h2>
+    </div>
+    <p class="module-tags">Greedy · 0/1 Knapsack DP</p>
+    <p class="module-desc">
+      Same orders, same budget, two strategies. Greedy grabs the cheapest orders
+      first and stops when the budget runs out — fast, but not always the best
+      combination. The DP knapsack checks every viable combination implicitly and
+      always finds the one with the highest total value.
+    </p>
+
+    <div class="panel">
+      <h3>Budget</h3>
+      <label class="field">Delivery / cargo budget (₹)</label>
+      <input type="range" id="budget-slider" min="3000" max="25000" step="500" value="15000" style="width:100%;">
+      <div class="stat-row">
+        <div class="stat"><span class="v" id="budget-val">₹15,000</span><span class="k">budget</span></div>
+      </div>
+      <div class="btn-row" style="margin-top:18px;">
+        <button class="primary" onclick="optimizerDemo.run()">Run both strategies</button>
+      </div>
+    </div>
+
+    <div class="twocol">
+      <div class="panel">
+        <h3>Greedy batch</h3>
+        <table class="data" id="greedy-table"></table>
+        <div class="stat-row">
+          <div class="stat"><span class="v" id="greedy-count">—</span><span class="k">orders fulfilled</span></div>
+          <div class="stat"><span class="v" id="greedy-cost">—</span><span class="k">total cost</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>DP knapsack batch</h3>
+        <table class="data" id="dp-table"></table>
+        <div class="stat-row">
+          <div class="stat"><span class="v" id="dp-count">—</span><span class="k">orders fulfilled</span></div>
+          <div class="stat"><span class="v" id="dp-value">—</span><span class="k">urgency value</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="complexity">
+      <span class="ctag">greedy O(n log n)</span>
+      <span class="ctag">0/1 knapsack O(n &times; budget)</span>
+    </div>
+  </section>
+
+  <!-- ================= MODULE 5: GRAPH ================= -->
+  <section class="module" id="graph">
+    <div class="module-head">
+      <span class="module-num">05</span>
+      <h2>Visualization</h2>
+    </div>
+    <p class="module-tags">Weighted graph · Dijkstra · BFS</p>
+    <p class="module-desc">
+      A small delivery network — one warehouse, five cities, weighted roads
+      between them. Pick a destination and Dijkstra finds the cheapest route,
+      lighting it up edge by edge.
+    </p>
+
+    <div class="panel">
+      <h3>Logistics network</h3>
+      <svg id="graph-svg" viewBox="0 0 640 320" width="100%" height="320"></svg>
+      <div class="btn-row" style="margin-top:14px;">
+        <label class="field" style="margin:0 8px 0 0; align-self:center;">Destination</label>
+        <select id="graph-target" style="font-family:var(--mono);font-size:12px;background:var(--bg-inset);border:1px solid var(--line);color:var(--text);padding:7px 10px;border-radius:6px;">
+          <option value="1">City A</option>
+          <option value="2">City B</option>
+          <option value="3">City C</option>
+          <option value="4">City D</option>
+          <option value="5" selected>City E</option>
+        </select>
+        <button class="primary" onclick="graphDemo.findPath()">Find shortest route</button>
+      </div>
+      <div class="log" id="graph-log">// pick a city and click "find shortest route"</div>
+    </div>
+
+    <div class="complexity">
+      <span class="ctag">Dijkstra O((V+E) log V)</span>
+      <span class="ctag">BFS O(V+E)</span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>AlgoVision 2.0 — DSA capstone project. Source on
+      <a href="#" id="github-link">GitHub</a>.
+      Every demo above runs the same logic as the Java console app, reimplemented
+      in plain JavaScript so it works without installing anything.</p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
