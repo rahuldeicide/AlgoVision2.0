@@ -66,6 +66,11 @@ for something that wasn't the main point of this project, but it's a fair
 thing to bring up if asked - I'd add it as a next step if I extended this.
 
 
+## How to run
+
+Click the link to access AlgoVision2.0 - https://rahuldeicide.github.io/AlgoVision2.0/
+
+
 
 ## Complexity reference
 
